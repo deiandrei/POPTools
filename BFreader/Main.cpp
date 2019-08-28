@@ -31,20 +31,6 @@ std::string GetFullFolderPath(std::vector<FolderEntry>& folderEntries, FolderEnt
 	return name;
 }
 
-void ParseFilesData(std::ifstream& in, BFHeader& header, FileIdOffsetTable& fileIdOffsetTable, SizeGrsTable& grsTable, std::vector<FileEntry>& files) {
-	std::cout << "Parsing files data length...";
-
-	for (uint4 i = 0; i < header.fcount; ++i) {
-		in.seekg((std::streampos)(fileIdOffsetTable.filePos[i] + 4));
-		byte1* data = new byte1[files[i].size];
-		in.read((char*)(&data), sizeof(byte1) * files[i].size);
-
-		files[i].data = data;
-	}
-
-
-}
-
 void ParseFileData(BFHeader& header, FileIdOffsetTable& fileIdOffsetTable, SizeGrsTable& grsTable, std::vector<FileEntry>& files, int id) {
 	std::stringstream in;
 	in.write((char*)(&files[id].data), sizeof(byte1) * files[id].size);
@@ -74,6 +60,56 @@ void ParseFileData(BFHeader& header, FileIdOffsetTable& fileIdOffsetTable, SizeG
 
 		files[id].fileData_length = (int)in.tellg();
 	}
+	else {
+		in.seekg((std::streampos)12);
+		in.read((char*)(&file_magic), sizeof(int));
+
+		//for non-compressed wol files
+		if (dec_size == enc_size && file_magic && magic) {
+			in.seekg((std::streampos)4);
+			in.read((char*)(&files[id].fileData_length), sizeof(int));
+			files[id].fileData_length += 12;
+		}
+		//for the other file types
+		else {
+			in.seekg((std::streampos)0);
+
+			byte1* buf = new byte1[files[id].size];
+			in.read((char*)(&buf), sizeof(byte1) * files[id].size);
+
+			for (int j = files[id].size - 1; j > 0; j--) {
+				if (buf[j] != 0) {
+					if (files[id].folder == 1) files[id].fileData_length = j + 7;
+					else if (files[id].folder == 3) {
+						files[id].fileData_length = j + 4;
+
+						//workaround for this mismatch stupidity
+						//wtf dude tho
+						if (std::string(files[id].name) == "ps2.ico") {
+							files[id].fileData_length = (int)grsTable.fileData_length[fileIdOffsetTable.id_grs[id]];
+						}
+					}
+					else if (files[id].folder == 0 || files[id].folder == 2 || files[id].folder == 4) files[id].fileData_length = j + 1;
+
+					j = 0;
+				}
+			}
+		}
+	}
+}
+
+void ParseFilesData(std::ifstream& in, BFHeader& header, FileIdOffsetTable& fileIdOffsetTable, SizeGrsTable& grsTable, std::vector<FileEntry>& files) {
+	std::cout << "Parsing files data length...";
+
+	for (uint4 i = 0; i < header.fcount; ++i) {
+		in.seekg((std::streampos)(fileIdOffsetTable.filePos[i] + 4));
+		byte1* data = new byte1[files[i].size];
+		in.read((char*)(&data), sizeof(byte1) * files[i].size);
+
+		files[i].data = data;
+		ParseFileData(header, fileIdOffsetTable, grsTable, files, i);
+	}
+	std::cout << "done!\n";
 }
 
 int main(int argc, char** argv) {
