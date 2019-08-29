@@ -20,22 +20,22 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BFHeader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="defines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FileIdOffsetTable.h">
+    <ClInclude Include="Header.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FileEntry.h">
+    <ClInclude Include="File.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FolderEntry.h">
+    <ClInclude Include="FileTable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SizeGrsTable.h">
+    <ClInclude Include="Folder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourcesTable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

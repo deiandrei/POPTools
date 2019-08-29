@@ -118,12 +118,12 @@
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BFHeader.h" />
+    <ClInclude Include="Header.h" />
     <ClInclude Include="defines.h" />
-    <ClInclude Include="FileEntry.h" />
-    <ClInclude Include="FileIdOffsetTable.h" />
-    <ClInclude Include="FolderEntry.h" />
-    <ClInclude Include="SizeGrsTable.h" />
+    <ClInclude Include="File.h" />
+    <ClInclude Include="FileTable.h" />
+    <ClInclude Include="Folder.h" />
+    <ClInclude Include="ResourcesTable.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
