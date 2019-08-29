@@ -16,7 +16,7 @@ namespace bf {
 		int total_length;
 	};
 
-	std::vector<Folder> ReadFolderEntriesFromFile(std::ifstream& in, Header& header, int& folderEntryUnkOffset, int& folderEntryUnk, int& headerTotalLength);
+	std::vector<Folder> ReadFoldersFromFile(std::ifstream& in, Header& header);
 
 	using FolderList = std::vector<Folder>;
 }

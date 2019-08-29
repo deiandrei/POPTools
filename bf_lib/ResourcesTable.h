@@ -16,7 +16,7 @@ namespace bf {
 		int data_length;
 		int total_length;
 
-		void ReadFromFile(std::ifstream& in, Header& header, FileTable& filePosId, std::vector<File>& files) {
+		void ReadFromFile(std::ifstream& in, Header& header, FileTable& fileTable, std::vector<File>& files) {
 			std::cout << "Looking for size.grs table offset";
 			int pos = 0;
 			for (int i = 0; i < (int)header.fcount; ++i) {
@@ -26,7 +26,7 @@ namespace bf {
 				}
 			}
 
-			in.seekg((std::streampos)(filePosId.filePos[pos] + 4));
+			in.seekg((std::streampos)(fileTable.filePos[pos] + 4));
 			std::cout << "done!\n";
 
 			//first read blocks of 8bytes one by one to count the files ( keep in mind that these 8byte blocks are basically 2 blocks of 4bytes representing (fileId - 4bytes, fileData_length - 4bytes) )
@@ -44,11 +44,11 @@ namespace bf {
 			fileData_length.resize(filesCount);
 			bridge_id_bf.resize(filesCount);
 
-			bf_entry = (int)filePosId.filePos[pos] + 4;
+			bf_entry = (int)fileTable.filePos[pos] + 4;
 			total_length = (int)files[pos].size;
 
 			//now come back to the same starting position and read the blocks independently
-			in.seekg((std::streampos)(filePosId.filePos[pos] + 4));
+			in.seekg((std::streampos)(fileTable.filePos[pos] + 4));
 
 			std::cout << "Reading size.grs table...";
 			for (uint4 id = 0; id < (uint4)filesCount; ++id) {

@@ -17,10 +17,10 @@ namespace bf {
 		int total_length;
 
 		byte1* data;
-		uint4 data_size;
+		uint4 data_size; // the real number of bytes written in the byte1 buffer
 	};
 
-	std::vector<File> ReadFileEntriesFromFile(std::ifstream& in, Header& header);
+	std::vector<File> ReadFilesFromFile(std::ifstream& in, Header& header);
 
 	using FileList = std::vector<File>;
 }
