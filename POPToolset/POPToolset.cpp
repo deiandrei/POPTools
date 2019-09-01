@@ -27,6 +27,18 @@ POPToolset::POPToolset(QWidget *parent) : QMainWindow(parent) {
 		}
 	});
 
+	connect(ui.fsTree, &QAbstractItemView::doubleClicked, [&](const QModelIndex& index) {
+		FSItem* item = static_cast<FSTreeModel*>(ui.fsTree->model())->getItemAtIndex(index);
+
+		if (item) {
+			if (item->Type() == FSType::FS_FILE) {
+				FileViewerForm* form = new FileViewerForm(mArchive, item->Tag());
+				form->show();
+			}
+
+		}
+	});
+
 	ui.fsTree->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui.fsTree, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(onCustomContextMenu(const QPoint&)));
 }

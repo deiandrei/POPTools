@@ -42,6 +42,9 @@
     <ClCompile Include="FSTreeModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FileViewerForm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="POPToolset.h">
@@ -50,9 +53,15 @@
     <QtMoc Include="FSTreeModel.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="FileViewerForm.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="POPToolset.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="FileViewerForm.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

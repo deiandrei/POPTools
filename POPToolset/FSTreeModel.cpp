@@ -18,6 +18,10 @@ int FSTreeModel::columnCount(const QModelIndex &parent) const
     return rootItem->columnCount();
 }
 
+void FSTreeModel::doubleClicked(const QModelIndex& index) {
+	int x = 0;
+}
+
 QVariant FSTreeModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid())

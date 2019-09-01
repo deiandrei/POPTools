@@ -9,6 +9,7 @@
 
 #include "../bf_lib/Archive.h"
 #include "FSTreeModel.h"
+#include "FileViewerForm.h"
 
 class POPToolset : public QMainWindow {
 	Q_OBJECT

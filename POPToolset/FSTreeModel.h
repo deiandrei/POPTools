@@ -1,9 +1,8 @@
 #ifndef FSTM_H
 #define FSTM_H
 
-#include <QAbstractItemModel>
-#include <QModelIndex>
-#include <QVariant>
+#include <QtCore/qabstractitemmodel.h>
+#include <QtCore/qvariant.h>
 
 #include "../bf_lib/Archive.h"
 
@@ -28,6 +27,8 @@ public:
     QModelIndex parent(const QModelIndex &index) const override;
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+
+	void doubleClicked(const QModelIndex& index);
 
 private:
     void setupModelData(FSItem* parent, bf::Archive* arc, int folderId);

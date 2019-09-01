@@ -1,8 +1,8 @@
 #ifndef FSItem_H
 #define FSItem_H
 
-#include <QVariant>
-#include <QVector>
+#include <QtCore/qvariant.h>
+#include <QtCore/qvector.h>
 
 enum FSType { FS_FOLDER, FS_FILE };
 
