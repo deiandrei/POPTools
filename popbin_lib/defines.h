@@ -9,8 +9,8 @@
 //The number at the end is the number of bytes
 using uint4 = unsigned int;
 using int4 = int;
-using int8 = long long;
 using uint8 = unsigned long long;
+using int8 = long long;
 using byte1 = unsigned char;
 
 #endif
