@@ -50,9 +50,9 @@ namespace bf {
 			int grsId = fileTable.bridge_id_grs[i]; //if the resourceTable knows the actual size of this, get that
 			uint4 size = grsId != -1 ? resTable.fileData_length[grsId] : files[i].size; //otherwise, fallback to the full block size
 
-			files[i].data = new byte1[size];		
+			files[i].data = new byte1[size];
 			files[i].data_size = size;
-			in.read((char*)(&files[i].data[0]), size);			
+			in.read((char*)(&files[i].data[0]), size);
 		}
 	}
 

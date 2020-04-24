@@ -4,6 +4,7 @@
 #include "ui_FileViewerForm.h"
 
 #include "../bf_lib/Archive.h"
+#include "../popbin_lib/BinArchive.h"
 
 class FileViewerForm : public QWidget
 {
@@ -12,6 +13,11 @@ class FileViewerForm : public QWidget
 	public:
 		FileViewerForm(bf::Archive* arc, int id, QWidget *parent = Q_NULLPTR);
 		~FileViewerForm();
+
+	public slots:
+		void ParseText();
+
+		void ParseRecursive(popbin::Entry* entry);
 
 	protected:
 		void UpdateLayout();
@@ -22,5 +28,8 @@ class FileViewerForm : public QWidget
 		bf::Archive* mArchiveRef;
 		int mFileID;
 		bf::File* mFile;
+
+		popbin::BinArchive* mBinaryArchive;
+		std::vector<std::pair<popbin::Entry*, std::string>> EntriesTagsTxt;
 
 };

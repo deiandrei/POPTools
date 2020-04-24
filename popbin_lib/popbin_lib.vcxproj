@@ -14,12 +14,11 @@
     <ClInclude Include="BinArchive.h" />
     <ClInclude Include="ByteBuffer.h" />
     <ClInclude Include="defines.h" />
-    <ClInclude Include="File.h" />
+    <ClInclude Include="Entry.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BinArchive.cpp" />
     <ClCompile Include="ByteBuffer.cpp" />
-    <ClCompile Include="File.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dependencies\lzolib\lzo_static_lib.vcxproj">

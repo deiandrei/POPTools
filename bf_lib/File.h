@@ -20,7 +20,7 @@ namespace bf {
 		uint4 data_size; // the real number of bytes written in the byte1 buffer
 	};
 
-	std::vector<File> ReadFilesFromFile(std::ifstream& in, Header& header);
+	std::vector<File> ReadFilesFromFile(std::istream& in, Header& header);
 
 	using FileList = std::vector<File>;
 }

@@ -1,7 +1,7 @@
 #include "File.h"
 
 namespace bf {
-	std::vector<File> ReadFilesFromFile(std::ifstream& in, Header& header) {
+	std::vector<File> ReadFilesFromFile(std::istream& in, Header& header) {
 		std::vector<File> fileEntries;
 		fileEntries.resize(header.fcount);
 

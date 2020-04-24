@@ -142,6 +142,9 @@
     <ProjectReference Include="..\bf_lib\bf_lib.vcxproj">
       <Project>{996adc9d-0939-4698-abdf-5adb5a75b919}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\popbin_lib\popbin_lib.vcxproj">
+      <Project>{0998c806-098c-4db3-9f3b-e8a5732ca6f5}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
