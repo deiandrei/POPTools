@@ -1,4 +1,6 @@
 #include "FileViewerForm.h"
+#include <QtWidgets/qfiledialog.h>
+#include <qmessagebox.h>
 
 FileViewerForm::FileViewerForm(bf::Archive* arc, int id, QWidget *parent) : QWidget(parent) {
 	ui.setupUi(this);
@@ -27,14 +29,60 @@ void FileViewerForm::UpdateLayout() {
 
 	// Fill the files list
 
-	for (auto& entry : mBinaryArchive->Entries) {
-		std::stringstream str;
-		str << "[" << entry.entry_beginPos << "] -> [" << entry.entry_endPos << "] - FileID: " << std::hex << entry.fileID;
+	for (int i = 0; i < (int)mBinaryArchive->Entries.size(); ++i) {
+		auto& entry = mBinaryArchive->Entries[i];
 
-		ui.filesList->addItem(new QListWidgetItem(str.str().c_str()));
+		std::stringstream str;
+		str << "[" << entry.entry_beginPos << "] -> [" << entry.entry_endPos << "] --- [" << std::hex << entry.fileID << "] " << entry.name;
+
+		QListWidgetItem* item = new QListWidgetItem(ui.filesList);
+		item->setText(str.str().c_str());
+		item->setData(Qt::UserRole, i);
+		
+		ui.filesList->addItem(item);
 	}
 
+	connect(ui.filesList, &QListWidget::itemSelectionChanged, [&]() {
+		int entryID = ui.filesList->currentItem()->data(Qt::UserRole).toInt();
+		auto& entry = mBinaryArchive->Entries[entryID];
+
+		// Get first 4 bytes which shows the entry type
+		if (entry.size > 0) {
+			char data[5] = { entry.data[0], entry.data[1], entry.data[2], entry.data[3], '\0' };
+			int4 idVar;
+			memcpy(&idVar, &data[0], sizeof(int4));
+
+			std::stringstream str;
+			str << data << " [" << std::hex << idVar << "]";
+
+			ui.entryTypeLabel->setText(str.str().c_str());
+		}
+		else {
+			ui.entryTypeLabel->setText("Empty");
+		}
+
+		ui.entrySizeLabel->setText(QString::number(entry.size));
+	});
+
 	connect(ui.tryTextParse, &QPushButton::pressed, this, &FileViewerForm::ParseText);
+
+	connect(ui.extractFile, &QPushButton::pressed, [&]() {
+		QString path = QFileDialog::getExistingDirectory(0, "Save file", mFile->name);
+		byte1* data = mBinaryArchive->GetData();
+		uint4 dataSize = mBinaryArchive->GetDataSize();
+
+		if (!path.isEmpty()) {
+			std::ofstream writer(path.toStdString() + "/" + mFile->name, std::ios::binary);
+
+			if (!writer.is_open()) return;
+
+			writer.write((char*)(&data[0]), sizeof(byte1) * dataSize);
+
+			writer.close();
+
+			QMessageBox::information(this, "Success!", QString(std::string("Successfully exported " + std::to_string(dataSize) + " bytes of data.").c_str()));
+		}
+	});
 }
 
 void FileViewerForm::ParseText() {

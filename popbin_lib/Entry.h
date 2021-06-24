@@ -27,6 +27,9 @@ namespace popbin {
 			fileID = 0;
 			data = nullptr;
 
+			name[0] = type[0] = '\0';
+			name_len = 0;
+
 			entry_beginPos = entry_endPos = data_beginPos = 0;
 		}
 

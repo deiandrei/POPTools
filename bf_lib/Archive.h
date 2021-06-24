@@ -18,7 +18,7 @@ namespace bf {
 
 			std::string FullFolderPath(int id);
 
-			void ExtractFile(int id, const std::string& savePath);
+			void ExtractFileRaw(int id, const std::string& savePath);
 			void ExtractFolder(int id, const std::string& savePath);
 
 		public:

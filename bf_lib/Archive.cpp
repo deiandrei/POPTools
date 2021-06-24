@@ -70,7 +70,7 @@ namespace bf {
 		return name;
 	}
 
-	void Archive::ExtractFile(int id, const std::string& savePath) {
+	void Archive::ExtractFileRaw(int id, const std::string& savePath) {
 		if (id < 0 || id >= (int)Files.size()) return;
 		
 		std::ofstream writer(savePath + "/" + Files[id].name, std::ios::binary);
@@ -90,7 +90,7 @@ namespace bf {
 		}
 
 		for (size_t i = 0; i < Files.size(); ++i) {
-			if (Files[i].folder == id) ExtractFile(i, savePath);
+			if (Files[i].folder == id) ExtractFileRaw(i, savePath);
 		}
 	}
 }

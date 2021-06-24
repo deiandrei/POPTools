@@ -3,6 +3,8 @@
 namespace popbin {
 	BinArchive::BinArchive(std::istream& in) {
 		std::istream* dataStream = nullptr;
+		mData = nullptr;
+		mDataSize = 0;
 
 		// check compressed vs uncompressed library
 		uint4 magic = 4009738393;
@@ -24,6 +26,16 @@ namespace popbin {
 		}
 		else {
 			dataStream = &in;
+		}
+
+		//Save final uncompressed data and its size
+		mDataSize = GetStreamSize(*dataStream);
+
+		if (mDataSize > 0) {
+			mData = new byte1[mDataSize];
+
+			dataStream->seekg(0, std::ios_base::beg);
+			dataStream->read((char*)&mData[0], mDataSize);
 		}
 
 		ReadEntries(dataStream);

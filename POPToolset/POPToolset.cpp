@@ -57,7 +57,7 @@ void POPToolset::onCustomContextMenu(const QPoint& point) {
 
 			if (!path.isEmpty()) {
 				if (item->Type() == FSType::FS_FILE) {
-					mArchive->ExtractFile(item->Tag(), path.toStdString());
+					mArchive->ExtractFileRaw(item->Tag(), path.toStdString());
 				}
 				else if (item->Type() == FSType::FS_FOLDER) {
 					mArchive->ExtractFolder(item->Tag(), path.toStdString());

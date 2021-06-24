@@ -37,6 +37,9 @@ namespace popbin {
 
 			int SearchEntryByID(int4 id);
 
+			byte1* GetData() { return mData; }
+			uint4 GetDataSize() { return mDataSize; }
+
 		private:
 			byte1* DecompressLzoBuffer(std::istream& in, uint4& bufferSize);
 			void AddEntryLink(Entry* entry, Entry* linkEntry, uint4 linkPos);
@@ -44,6 +47,9 @@ namespace popbin {
 			void ReadEntries(std::istream* in);
 			void CheckEntriesLinks();
 			//void ParseFiles(ByteBuffer* buffer);
+
+			byte1* mData;
+			uint4 mDataSize;
 
 	};
 }
