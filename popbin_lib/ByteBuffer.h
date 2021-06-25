@@ -5,12 +5,15 @@
 
 class ByteBuffer {
 	public:
-		ByteBuffer(byte1* buffer, uint4 size);
-		~ByteBuffer() { }
+		ByteBuffer(byte1* buffer, uint4 size, bool copyBytes = false);
+		~ByteBuffer();
 		
 		template<typename T>
 		T Read() {
-			if (sizeof(T) + mPosition >= mSize) return 0;
+			if (sizeof(T) + mPosition > mSize) {
+				mPosition = mSize;
+				return 0;
+			}
 
 			T temp;
 			memcpy(&temp, mByteContainer + mPosition, sizeof(T));
@@ -18,10 +21,35 @@ class ByteBuffer {
 			return temp;
 		}
 
-		void ReadCharArray(char* buf, uint4 size);
+		template<typename T>
+		void Read(T* dest) {
+			if (sizeof(T) + mPosition > mSize) {
+				mPosition = mSize;
+				return;
+			}
+
+			memcpy(dest, mByteContainer + mPosition, sizeof(T));
+			mPosition += sizeof(T);
+		}
+
+		template<typename T>
+		void ReadArray(T* destStartPtr, uint4 count) {
+			if ((sizeof(T) * count + mPosition) > mSize) {
+				mPosition = mSize;
+				return;
+			}
+
+			memcpy(destStartPtr, mByteContainer + mPosition, sizeof(T) * count);
+			mPosition += sizeof(T) * count;
+		}
+
+		bool EndReached() { return mPosition >= mSize; }
 
 		uint4& Position() { return mPosition; }
 		uint4 Size() { return mSize; }
+		uint4 BytesRemaining() { return mSize - mPosition; }
+
+		byte1* Data() { return mByteContainer; }
 
 	private:
 		byte1* mByteContainer;

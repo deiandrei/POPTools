@@ -1,13 +1,18 @@
 #include "ByteBuffer.h"
 
-ByteBuffer::ByteBuffer(byte1* buffer, uint4 size) {
+ByteBuffer::ByteBuffer(byte1* buffer, uint4 size, bool copyBytes) {
 	mPosition = 0;
-	mByteContainer = buffer;
 	mSize = size;
+
+	if (copyBytes) {
+		mByteContainer = new byte1[size];
+		memcpy(mByteContainer, buffer, size);
+	}
+	else {
+		mByteContainer = buffer;
+	}
 }
 
-void ByteBuffer::ReadCharArray(char* buf, uint4 size) {
-	if (size + mPosition >= mSize) return;
-
-	memcpy(buf, mByteContainer + mPosition, size);
+ByteBuffer::~ByteBuffer() {
+	delete[] mByteContainer;
 }

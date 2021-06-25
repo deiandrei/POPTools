@@ -28,28 +28,35 @@ namespace popbin {
 	class BinArchive {
 		public:
 			BinArchive(std::istream& in);
-			~BinArchive() { }
+			~BinArchive() { delete mDataBuffer; }
 
 			std::vector<Entry> Entries;
 			std::map<Entry*, std::vector<EntryLink>> EntriesLinks;
 
 			static uint4 GetStreamSize(std::istream& in);
 
+			static std::string EntryType(int4 type);
+
 			int SearchEntryByID(int4 id);
 
-			byte1* GetData() { return mData; }
-			uint4 GetDataSize() { return mDataSize; }
+			ByteBuffer* GetBuffer() { return mDataBuffer; }
+
+			void ExtractEntry(int id, const std::string& savePath);
+			void ExtractAllEntries(const std::string& savePath) { for (int i = 0; i < (int)Entries.size(); ++i) ExtractEntry(i, savePath); }
+
+			void TryParseLinksHeader();
 
 		private:
-			byte1* DecompressLzoBuffer(std::istream& in, uint4& bufferSize);
+			ByteBuffer* DecompressLzoBuffer(ByteBuffer* buff);
 			void AddEntryLink(Entry* entry, Entry* linkEntry, uint4 linkPos);
 
-			void ReadEntries(std::istream* in);
+			void ReadEntries();
 			void CheckEntriesLinks();
 			//void ParseFiles(ByteBuffer* buffer);
 
-			byte1* mData;
-			uint4 mDataSize;
+			ByteBuffer* mDataBuffer;
+			std::map<int4, int> mEntriesFileIDs;
+
 
 	};
 }

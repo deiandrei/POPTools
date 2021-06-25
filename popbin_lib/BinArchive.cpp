@@ -2,43 +2,33 @@
 
 namespace popbin {
 	BinArchive::BinArchive(std::istream& in) {
-		std::istream* dataStream = nullptr;
-		mData = nullptr;
-		mDataSize = 0;
+		uint4 dataSize = GetStreamSize(in);
+		byte1* dataBuff = new byte1[dataSize];
+		in.seekg(0, std::ios_base::beg);
+		in.read((char*)dataBuff, dataSize);
+		
+		mDataBuffer = new ByteBuffer(dataBuff, dataSize);
 
 		// check compressed vs uncompressed library
 		uint4 magic = 4009738393;
-
-		in.seekg(0, in.beg);
-		uint4 dec_size, enc_size;
-		in.read((char*)(&dec_size), sizeof(uint4));
-		in.read((char*)(&enc_size), sizeof(uint4));
-		in.seekg(13, in.beg);
-		uint4 file_magic; in.read((char*)(&file_magic), sizeof(uint4));
-		in.seekg(14, in.beg);
-		uint4 file_magic2; in.read((char*)(&file_magic2), sizeof(uint4));
+		
+		uint4 dec_size, enc_size, file_magic, file_magic2;
+		mDataBuffer->Read<uint4>(&dec_size);
+		mDataBuffer->Read<uint4>(&enc_size);
+		mDataBuffer->Position() = 13;
+		mDataBuffer->Read<uint4>(&file_magic);
+		mDataBuffer->Position() = 14;
+		mDataBuffer->Read<uint4>(&file_magic2);
 
 		if ((file_magic == magic || file_magic2 == magic) && dec_size != enc_size)
 		{
-			uint4 size;
-			byte1* decompressed_data = DecompressLzoBuffer(in, size);
-			dataStream = new std::binarystream(decompressed_data, size);
-		}
-		else {
-			dataStream = &in;
+			ByteBuffer* decompressed_data = DecompressLzoBuffer(mDataBuffer);
+
+			delete mDataBuffer;
+			mDataBuffer = decompressed_data;
 		}
 
-		//Save final uncompressed data and its size
-		mDataSize = GetStreamSize(*dataStream);
-
-		if (mDataSize > 0) {
-			mData = new byte1[mDataSize];
-
-			dataStream->seekg(0, std::ios_base::beg);
-			dataStream->read((char*)&mData[0], mDataSize);
-		}
-
-		ReadEntries(dataStream);
+		ReadEntries();
 		CheckEntriesLinks();
 		
 	}
@@ -51,6 +41,18 @@ namespace popbin {
 		return length;
 	}
 
+	std::string BinArchive::EntryType(int4 type) {
+		switch (type) {
+			case 2003793710:
+				return ".wow";
+				break;
+
+			default:
+				return std::string();
+				break;
+		}
+	}
+
 	int BinArchive::SearchEntryByID(int4 id) {
 		for (int i = 0; i < (int)Entries.size(); ++i) {
 			if (Entries[i].fileID == id) return i;
@@ -59,16 +61,33 @@ namespace popbin {
 		return -1;
 	}
 
-	byte1* BinArchive::DecompressLzoBuffer(std::istream& in, uint4& bufferSize) {
+	void BinArchive::ExtractEntry(int id, const std::string& savePath) {
+		if (id < 0 || id >= (int)Entries.size()) return;
+
+		std::stringstream entryName;
+		entryName << id << "_" << std::hex << Entries[id].fileID << ".rawbin";
+
+		std::ofstream writer(savePath + "/" + entryName.str(), std::ios::binary);
+
+		if (!writer.is_open()) return;
+
+		writer.write((char*)(&Entries[id].data[0]), sizeof(byte1) * Entries[id].size);
+
+		writer.close();
+	}
+
+	ByteBuffer* BinArchive::DecompressLzoBuffer(ByteBuffer* buff) {
 		std::vector<byte1> memoryBuffer;
-		in.seekg(0, std::ios::beg);
-		int size_dec;
+		uint4 size_dec, size_enc;
+
+		buff->Position() = 0;
 
 		do {
-			in.read((char*)(&size_dec), sizeof(int));
-			int size_enc; in.read((char*)(&size_enc), sizeof(int));
+			buff->Read<uint4>(&size_dec);
+			buff->Read<uint4>(&size_enc);
+			
 			byte1* compressed = new byte1[size_enc];
-			in.read((char*)& compressed[0], size_enc);
+			buff->ReadArray<byte1>(compressed, size_enc);
 
 			//wtf are those data blocks?!
 			if (size_dec == size_enc) {
@@ -93,12 +112,8 @@ namespace popbin {
 			delete[] compressed;
 		} while (size_dec == 131072);
 
-		byte1* finalBuff = new byte1[memoryBuffer.size()];
-		bufferSize = (uint4)memoryBuffer.size();
-		memcpy(&finalBuff[0], memoryBuffer.data(), memoryBuffer.size());
+		ByteBuffer* finalBuff = new ByteBuffer(memoryBuffer.data(), (uint4)memoryBuffer.size(), true);
 		return finalBuff;
-
-		return nullptr;
 	}
 
 	void BinArchive::AddEntryLink(Entry* entry, Entry* linkEntry, uint4 linkPos) {
@@ -125,30 +140,31 @@ namespace popbin {
 		links[linkID].LinkPositions.push_back(linkPos);
 	}
 
-	void BinArchive::ReadEntries(std::istream* in) {
-		in->seekg(0, std::ios::beg);
-		uint4 streamSize = GetStreamSize(*in);
+	void BinArchive::ReadEntries() {
+		mDataBuffer->Position() = 0;
 
-		while ((uint4)in->tellg() < streamSize - 1) {
+		while (!mDataBuffer->EndReached()) {
 			Entry entry;
 
 			//for easy debugging
-			entry.entry_beginPos = (uint4)in->tellg();
+			entry.entry_beginPos = mDataBuffer->Position();
 			//
 
-			in->read((char*)&entry.size, sizeof(uint4));
-			in->read((char*)&entry.magic, sizeof(int4));
-			in->read((char*)&entry.fileID, sizeof(int4));
+			mDataBuffer->Read<uint4>(&entry.size);
+			mDataBuffer->Read<int4>(&entry.magic);
+			mDataBuffer->Read<int4>(&entry.fileID);
+
+			mEntriesFileIDs.insert({ entry.fileID, (int)Entries.size() });
 
 			if (entry.size > 0) {
-				entry.data_beginPos = (uint4)in->tellg();
+				entry.data_beginPos = mDataBuffer->Position();
 
 				entry.data = new byte1[entry.size];
-				in->read((char*)entry.data, entry.size);
+				mDataBuffer->ReadArray<byte1>(entry.data, entry.size);
 			}
 
 			//for easy debugging
-			entry.entry_endPos = (uint4)in->tellg();
+			entry.entry_endPos = mDataBuffer->Position();
 			//
 			
 			Entries.push_back(entry);
@@ -190,5 +206,26 @@ namespace popbin {
 		}
 
 		std::cout << EntriesLinks.size() << " Links found and " << linkposCounts << " positions. \n";
+	}
+
+	void BinArchive::TryParseLinksHeader() {
+		std::binarystream bs(Entries[3]);
+
+		int linksCount = (bs.size() / 4) - 1;
+		std::vector<int4> fileIds;
+		for (int i = 0; i < linksCount; ++i) {
+			int4 temp;
+			bs.read((char*)&temp, sizeof(int4));
+			fileIds.push_back(temp);
+		}
+
+		int found = 0;
+		for (auto& id : fileIds) {
+			if (mEntriesFileIDs.find(id) != mEntriesFileIDs.end()) {
+				found++;
+			}
+		}
+
+		std::cout << "\nFound " << found << " out of " << (int)mEntriesFileIDs.size() << " in the links header! \n";
 	}
 }

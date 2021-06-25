@@ -17,15 +17,17 @@ FileViewerForm::FileViewerForm(bf::Archive* arc, int id, QWidget *parent) : QWid
 }
 
 FileViewerForm::~FileViewerForm() {
-
+	delete mBinaryArchive;
 }
 
 void FileViewerForm::UpdateLayout() {
 	ui.nameLabel->setText(QString(mFile->name));
-	ui.sizeLabel->setText(QString::number(mFile->data_size) + " (" + QString::number((float)mFile->data_size / float(1024*1024)) + " MB)");
+	ui.sizeLabel->setText(QString::number(mBinaryArchive->GetBuffer()->Size()) + " (" + QString::number((float)mBinaryArchive->GetBuffer()->Size() / float(1024*1024)) + " MB)");
 	ui.typeLabel->setText(QString("NoType"));
 	ui.grsIdLabel->setText(QString::number(mArchiveRef->FileTables.bridge_id_grs[mFileID]));
 	ui.entriesCountLabel->setText(QString::number((int)mBinaryArchive->Entries.size()));
+
+	mBinaryArchive->TryParseLinksHeader();
 
 	// Fill the files list
 
@@ -68,8 +70,8 @@ void FileViewerForm::UpdateLayout() {
 
 	connect(ui.extractFile, &QPushButton::pressed, [&]() {
 		QString path = QFileDialog::getExistingDirectory(0, "Save file", mFile->name);
-		byte1* data = mBinaryArchive->GetData();
-		uint4 dataSize = mBinaryArchive->GetDataSize();
+		byte1* data = mBinaryArchive->GetBuffer()->Data();
+		uint4 dataSize = mBinaryArchive->GetBuffer()->Size();
 
 		if (!path.isEmpty()) {
 			std::ofstream writer(path.toStdString() + "/" + mFile->name, std::ios::binary);
@@ -81,6 +83,14 @@ void FileViewerForm::UpdateLayout() {
 			writer.close();
 
 			QMessageBox::information(this, "Success!", QString(std::string("Successfully exported " + std::to_string(dataSize) + " bytes of data.").c_str()));
+		}
+	});
+
+	connect(ui.extractEntries, &QPushButton::pressed, [&]() {
+		QString path = QFileDialog::getExistingDirectory(0, "Save files");
+
+		if (!path.isEmpty()) {
+			mBinaryArchive->ExtractAllEntries(path.toStdString());
 		}
 	});
 }
