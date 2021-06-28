@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
 	std::vector<vec2> uvs;
 	std::vector<int2> indices_verts, indices_uvs, indices_normals;
 
-
+	
 	ByteBuffer* bb = new ByteBuffer(entry.data, entry.size);
 	uint4 type, temp;
 	bb->Read<uint4>(&type);

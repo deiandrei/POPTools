@@ -29,7 +29,7 @@ namespace popbin {
 		}
 
 		ReadEntries();
-		CheckEntriesLinks();
+		//CheckEntriesLinks();
 		
 	}
 

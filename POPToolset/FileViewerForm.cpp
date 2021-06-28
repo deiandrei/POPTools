@@ -2,6 +2,9 @@
 #include <QtWidgets/qfiledialog.h>
 #include <qmessagebox.h>
 
+struct vec3 { float x, y, z; vec3(float X, float Y, float Z) { x = X; y = Y; z = Z; } };
+struct vec2 { float x, y; vec2(float X, float Y) { x = X; y = Y; } };
+
 FileViewerForm::FileViewerForm(bf::Archive* arc, int id, QWidget *parent) : QWidget(parent) {
 	ui.setupUi(this);
 
@@ -35,7 +38,7 @@ void FileViewerForm::UpdateLayout() {
 		auto& entry = mBinaryArchive->Entries[i];
 
 		std::stringstream str;
-		str << "[" << entry.entry_beginPos << "] -> [" << entry.entry_endPos << "] --- [" << std::hex << entry.fileID << "] " << entry.name;
+		str << "[" << entry.entry_beginPos << "] -> [" << entry.entry_endPos << "] --- [" << i << "] [" << std::hex << entry.fileID << "] " << entry.name;
 
 		QListWidgetItem* item = new QListWidgetItem(ui.filesList);
 		item->setText(str.str().c_str());
@@ -96,36 +99,38 @@ void FileViewerForm::UpdateLayout() {
 }
 
 void FileViewerForm::ParseText() {
-	ParseRecursive(&mBinaryArchive->Entries[1]);
+	ParseRecursive(&mBinaryArchive->Entries[ui.filesList->currentItem()->data(Qt::UserRole).toInt()]);
 
 
 }
 
 void FileViewerForm::ParseRecursive(popbin::Entry* entry) {
-	std::binarystream bs(*entry);
+	//std::binarystream bs(*entry);
 
-	std::vector<popbin::Entry*> recursiveEntries;
+	//std::vector<popbin::Entry*> recursiveEntries;
 
-	while ((uint4)bs.tellg() < bs.size()) {
-		int4 entryID;
-		bs.read((char*)&entryID, sizeof(int4));
-		char tag[5];
-		bs.read(&tag[0], 4);
-		tag[4] = '\0';
+	//while ((uint4)bs.tellg() < bs.size()) {
+	//	int4 entryID;
+	//	bs.read((char*)&entryID, sizeof(int4));
+	//	char tag[5];
+	//	bs.read(&tag[0], 4);
+	//	tag[4] = '\0';
 
-		int entryIndex = mBinaryArchive->SearchEntryByID(entryID);
-		if (entryIndex != -1) {
-			//std::cout << "Found entry " << std::hex << entryID << std::dec << " at index " << entryIndex << "\n";
-			EntriesTagsTxt.push_back(std::pair<popbin::Entry*, std::string>(&mBinaryArchive->Entries[entryIndex], tag));
+	//	int entryIndex = mBinaryArchive->SearchEntryByID(entryID);
+	//	if (entryIndex != -1) {
+	//		//std::cout << "Found entry " << std::hex << entryID << std::dec << " at index " << entryIndex << "\n";
+	//		EntriesTagsTxt.push_back(std::pair<popbin::Entry*, std::string>(&mBinaryArchive->Entries[entryIndex], tag));
 
-			if(std::string(tag) == ".txg") recursiveEntries.push_back(&mBinaryArchive->Entries[entryIndex]);
-		}
-		else {
-			std::cout << "Entry with ID " << std::hex << entryID << std::dec << " referenced in Entry " << std::hex << entry->fileID << std::dec << " not found!" << "\n";
-		}
-	}
+	//		if(std::string(tag) == ".txg") recursiveEntries.push_back(&mBinaryArchive->Entries[entryIndex]);
+	//	}
+	//	else {
+	//		std::cout << "Entry with ID " << std::hex << entryID << std::dec << " referenced in Entry " << std::hex << entry->fileID << std::dec << " not found!" << "\n";
+	//	}
+	//}
 
-	for (auto entry : recursiveEntries) {
-		ParseRecursive(entry);
-	}
+	//for (auto entry : recursiveEntries) {
+	//	ParseRecursive(entry);
+	//}
+
+	int2 x;
 }

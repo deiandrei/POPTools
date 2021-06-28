@@ -7,6 +7,8 @@
 #include <vector>
 
 //The number at the end is the number of bytes
+using uint2 = unsigned short;
+using int2 = short;
 using uint4 = unsigned int;
 using int4 = int;
 using int8 = long long;
