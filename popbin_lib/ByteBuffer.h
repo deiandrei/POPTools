@@ -34,6 +34,7 @@ class ByteBuffer {
 
 		template<typename T>
 		void ReadArray(T* destStartPtr, uint4 count) {
+			if (count == 0) return;
 			if ((sizeof(T) * count + mPosition) > mSize) {
 				mPosition = mSize;
 				return;
