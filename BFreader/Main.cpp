@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
 
 	popbin::BinArchive* arch = new popbin::BinArchive(in1);
 
-	popbin::Entry& entry = arch->Entries[49];
+	popbin::Entry& entry = arch->Entries[21];
 
 	// Geometry parser
 	std::vector<vec3> vertices, normals;
@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
 		vertices.push_back(vec3(x, y, z));
 	}
 
-	if (param2 > 4) {
+	if (param2 == 9) {
 		// i gotta find out which mesh has normals in a stable way
 		for (int i = 0; i < vertices_count; ++i) {
 			float x, y, z;
