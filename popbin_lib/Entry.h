@@ -4,31 +4,52 @@
 #include "ByteBuffer.h"
 
 namespace popbin {
+	class BinArchive;
+	class AbstractModel;
+
+	enum EntryType {
+		EMPTY,
+		UNKNOWN,
+		WOW,
+		DESCRIPTOR,
+		GAO,
+		GEOMETRY,
+		TEXTURE_PACK,
+		TEXTURE_INFO,
+		TEXTURE_HEADER,
+		TEXTURE_PALETTE,
+		TEXTURE,
+		TERMINATOR,
+		NUM_TYPES
+	};
+
 	struct Entry {
 		uint4 size;
 		int4 magic;
 		int4 fileID;
-	
-		byte1* data; // data.length = byte1 * size
+		EntryType type = EntryType::UNKNOWN;
+		byte1* data;
+		
+		BinArchive* parentArchive;
 
-		//For debugging
+		AbstractModel* model;
+
+		// For debugging
 		uint4 entry_beginPos;
 		uint4 entry_endPos;
 		uint4 data_beginPos;
 
 		//Utils
 		char name[64];
-		uint4 name_len;
-		char type[64];
 
 		Entry() {
 			size = 0;
 			magic = 0;
 			fileID = 0;
 			data = nullptr;
+			model = nullptr;
 
-			name[0] = type[0] = '\0';
-			name_len = 0;
+			name[0] = '\0';
 
 			entry_beginPos = entry_endPos = data_beginPos = 0;
 		}

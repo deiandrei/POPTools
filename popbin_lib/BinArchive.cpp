@@ -1,5 +1,9 @@
 #include "BinArchive.h"
 
+#include "DataModels/DescriptorModel.h"
+#include "DataModels/TexturePackModel.h"
+#include "DataModels/GeometryModel.h"
+
 namespace popbin {
 	BinArchive::BinArchive(std::istream& in) {
 		uint4 dataSize = GetStreamSize(in);
@@ -30,7 +34,7 @@ namespace popbin {
 
 		ReadEntries();
 		//CheckEntriesLinks();
-		
+		ParseEntries();
 	}
 
 	uint4 BinArchive::GetStreamSize(std::istream& in) {
@@ -41,16 +45,65 @@ namespace popbin {
 		return length;
 	}
 
-	std::string BinArchive::EntryType(int4 type) {
-		switch (type) {
-			case 2003793710:
-				return ".wow";
-				break;
-
-			default:
-				return std::string();
-				break;
+	EntryType BinArchive::IntToEntryType(int4 type) {
+		if (type == 1) { //=1
+			return EntryType::GEOMETRY;
 		}
+		else if (type == 4) { //texturepack
+			return EntryType::TEXTURE_PACK;
+		}
+		else if (type == 5) { //textureinfo ??
+			return EntryType::TEXTURE_INFO;
+		}
+		else if (type == 0x0FF7C0DE) {
+			return EntryType::TERMINATOR;
+		}
+		else if (type == 0x6F61672E) { //.gao
+			return EntryType::GAO;
+		}
+
+		return EntryType::UNKNOWN;
+	}
+
+	std::string BinArchive::EntryTypeToString(EntryType type) {
+		if (type == EntryType::EMPTY) {
+			return "Empty";
+		}
+		else if (type == EntryType::GAO) {
+			return "GameActorObject";
+		}
+		else if (type == EntryType::GEOMETRY) {
+			return "Geometry";
+		}
+		else if (type == EntryType::WOW) {
+			return "WOW";
+		}
+		else if (type == EntryType::TEXTURE_PACK) {
+			return "TexturePack";
+		}
+		else if (type == EntryType::TEXTURE_INFO) {
+			return "TextureInfo";
+		}
+		else if (type == EntryType::TEXTURE_HEADER) {
+			return "TextureHeader";
+		}
+		else if (type == EntryType::TEXTURE_PALETTE) {
+			return "TexturePalette";
+		}
+		else if (type == EntryType::TEXTURE) {
+			return "Texture";
+		}
+		else if (type == EntryType::DESCRIPTOR) {
+			return "Descriptor";
+		}
+		else if (type == EntryType::TERMINATOR) {
+			return "Terminator";
+		}
+		else if (type == EntryType::UNKNOWN) {
+			return "Unknown";
+		}
+
+		return "Undefined";
 	}
 
 	int BinArchive::SearchEntryByID(int4 id) {
@@ -146,6 +199,8 @@ namespace popbin {
 		while (!mDataBuffer->EndReached()) {
 			Entry entry;
 
+			entry.parentArchive = this;
+
 			//for easy debugging
 			entry.entry_beginPos = mDataBuffer->Position();
 			//
@@ -228,4 +283,77 @@ namespace popbin {
 
 		std::cout << "\nFound " << found << " out of " << (int)mEntriesFileIDs.size() << " in the links header! \n";
 	}
+
+	void BinArchive::ParseEntries() {
+		for (int i = 0; i < (int)Entries.size(); i++) {
+			Entry& entry = Entries[i];
+
+			if (entry.size) {
+				int4 temp;
+				memcpy(&temp, entry.data, sizeof(int4));
+
+				if (i == 3) { // special case for the descriptor
+					entry.type = EntryType::DESCRIPTOR;
+				}
+				else {
+
+					if (temp == 1) { //=1
+						entry.type = EntryType::GEOMETRY;
+					}
+					else if (temp == 4) { //texturepack
+						entry.type = EntryType::TEXTURE_PACK;
+					}
+					else if (temp == 5) { //textureinfo ??
+						entry.type = EntryType::TEXTURE_INFO;
+					}
+					else if (temp == 0x0FF7C0DE) {
+						entry.type = EntryType::TERMINATOR;
+					}
+					else if (temp == 0x6F61672E) { //.gao
+						entry.type = EntryType::GAO;
+					}
+					else if (temp == entry.fileID) { //this is interesting
+						// decide what kind of texture info it is
+						int4 next_bytes;
+						memcpy(&next_bytes, entry.data + 4, sizeof(int4));
+
+						if (next_bytes == 0xFFFFFFFF) {
+							if (entry.size <= 64) {
+								entry.type = EntryType::TEXTURE_HEADER;
+							}
+							else {
+								entry.type = EntryType::TEXTURE;
+							}
+						}
+						else {
+							entry.type = EntryType::TEXTURE_PALETTE;
+						}
+
+					}
+					else {
+						entry.type = EntryType::UNKNOWN;
+					}
+
+				}
+			}
+			else {
+				entry.type = EntryType::EMPTY;
+			}
+
+			ParseEntry(i, entry.type);
+		}
+
+	}
+
+	void BinArchive::ParseEntry(int id, EntryType type) {
+		Entry& entry = Entries[id];
+		
+		if (type == EntryType::DESCRIPTOR) {
+			entry.model = new DescriptorModel(&entry);
+		}
+		else if (type == EntryType::TEXTURE_PACK) {
+			entry.model = new TexturePackModel(&entry);
+		}
+	}
+
 }

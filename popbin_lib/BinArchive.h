@@ -25,6 +25,7 @@ namespace std {
 }
 
 namespace popbin {
+
 	class BinArchive {
 		public:
 			BinArchive(std::istream& in);
@@ -35,7 +36,8 @@ namespace popbin {
 
 			static uint4 GetStreamSize(std::istream& in);
 
-			static std::string EntryType(int4 type);
+			static EntryType IntToEntryType(int4 type);
+			static std::string EntryTypeToString(EntryType type);
 
 			int SearchEntryByID(int4 id);
 
@@ -46,13 +48,16 @@ namespace popbin {
 
 			void TryParseLinksHeader();
 
+			void ParseEntries();
+
 		private:
 			ByteBuffer* DecompressLzoBuffer(ByteBuffer* buff);
 			void AddEntryLink(Entry* entry, Entry* linkEntry, uint4 linkPos);
 
 			void ReadEntries();
 			void CheckEntriesLinks();
-			//void ParseFiles(ByteBuffer* buffer);
+			
+			void ParseEntry(int id, EntryType type);
 
 			ByteBuffer* mDataBuffer;
 			std::map<int4, int> mEntriesFileIDs;

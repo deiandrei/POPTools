@@ -9,7 +9,7 @@ struct vec3 { float x, y, z; vec3(float X, float Y, float Z) { x = X; y = Y; z =
 struct vec2 { float x, y; vec2(float X, float Y) { x = X; y = Y; } };
 
 int main(int argc, char** argv) {
-	std::ifstream in1("Prince_Weapons_wow_ff05c7fe.bin", std::ios::binary);
+	std::ifstream in1("810_Fake_Tower_P01_wow_ff087a7c.bin", std::ios::binary);
 
 	if (!in1.is_open()) {
 		std::cout << "Its bad.";
@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
 
 	popbin::BinArchive* arch = new popbin::BinArchive(in1);
 
-	popbin::Entry& entry = arch->Entries[21];
+	popbin::Entry& entry = arch->Entries[63];
 
 	// Geometry parser
 	std::vector<vec3> vertices, normals;
@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
 		bb->Read<float>(&y);
 		bb->Read<float>(&z);
 
-		vertices.push_back(vec3(x, y, z));
+		vertices.push_back(vec3(x, z, -y)); // Z up to Y up fix
 	}
 
 	if (param2 == 9) {
@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
 			bb->Read<float>(&y);
 			bb->Read<float>(&z);
 
-			normals.push_back(vec3(x, y, z));
+			normals.push_back(vec3(x, z, -y)); // Z up to Y up fix
 		}
 	}
 	else {

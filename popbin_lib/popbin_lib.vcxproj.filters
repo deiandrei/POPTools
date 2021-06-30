@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\DataModels">
+      <UniqueIdentifier>{0a3f5084-5393-42a3-a1e6-16a9667fb394}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DataModels">
+      <UniqueIdentifier>{eae45c29-d0c8-4fe3-85b1-74a420377ea1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="defines.h">
@@ -27,6 +33,18 @@
     <ClInclude Include="Entry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DataModels\AbstractModel.h">
+      <Filter>Header Files\DataModels</Filter>
+    </ClInclude>
+    <ClInclude Include="DataModels\DescriptorModel.h">
+      <Filter>Header Files\DataModels</Filter>
+    </ClInclude>
+    <ClInclude Include="DataModels\TexturePackModel.h">
+      <Filter>Header Files\DataModels</Filter>
+    </ClInclude>
+    <ClInclude Include="DataModels\GeometryModel.h">
+      <Filter>Header Files\DataModels</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ByteBuffer.cpp">
@@ -34,6 +52,15 @@
     </ClCompile>
     <ClCompile Include="BinArchive.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DataModels\DescriptorModel.cpp">
+      <Filter>Source Files\DataModels</Filter>
+    </ClCompile>
+    <ClCompile Include="DataModels\TexturePackModel.cpp">
+      <Filter>Source Files\DataModels</Filter>
+    </ClCompile>
+    <ClCompile Include="DataModels\GeometryModel.cpp">
+      <Filter>Source Files\DataModels</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

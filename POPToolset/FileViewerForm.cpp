@@ -2,8 +2,7 @@
 #include <QtWidgets/qfiledialog.h>
 #include <qmessagebox.h>
 
-struct vec3 { float x, y, z; vec3(float X, float Y, float Z) { x = X; y = Y; z = Z; } };
-struct vec2 { float x, y; vec2(float X, float Y) { x = X; y = Y; } };
+#include "../popbin_lib/DataModels/GeometryModel.h"
 
 FileViewerForm::FileViewerForm(bf::Archive* arc, int id, QWidget *parent) : QWidget(parent) {
 	ui.setupUi(this);
@@ -30,7 +29,7 @@ void FileViewerForm::UpdateLayout() {
 	ui.grsIdLabel->setText(QString::number(mArchiveRef->FileTables.bridge_id_grs[mFileID]));
 	ui.entriesCountLabel->setText(QString::number((int)mBinaryArchive->Entries.size()));
 
-	mBinaryArchive->TryParseLinksHeader();
+	//mBinaryArchive->TryParseLinksHeader();
 
 	// Fill the files list
 
@@ -38,7 +37,7 @@ void FileViewerForm::UpdateLayout() {
 		auto& entry = mBinaryArchive->Entries[i];
 
 		std::stringstream str;
-		str << "[" << entry.entry_beginPos << "] -> [" << entry.entry_endPos << "] --- [" << i << "] [" << std::hex << entry.fileID << "] " << entry.name;
+		str << "[" << entry.entry_beginPos << "] -> [" << entry.entry_endPos << "] --- [" << i << "] " << popbin::BinArchive::EntryTypeToString(entry.type) << "_" << std::hex << entry.fileID <<  strlen(entry.name) ? "_" + std::string(entry.name) : "";
 
 		QListWidgetItem* item = new QListWidgetItem(ui.filesList);
 		item->setText(str.str().c_str());
@@ -51,20 +50,7 @@ void FileViewerForm::UpdateLayout() {
 		int entryID = ui.filesList->currentItem()->data(Qt::UserRole).toInt();
 		auto& entry = mBinaryArchive->Entries[entryID];
 
-		// Get first 4 bytes which shows the entry type
-		if (entry.size > 0) {
-			char data[5] = { entry.data[0], entry.data[1], entry.data[2], entry.data[3], '\0' };
-			int4 idVar;
-			memcpy(&idVar, &data[0], sizeof(int4));
-
-			std::stringstream str;
-			str << data << " [" << std::hex << idVar << "]";
-
-			ui.entryTypeLabel->setText(str.str().c_str());
-		}
-		else {
-			ui.entryTypeLabel->setText("Empty");
-		}
+		ui.entryTypeLabel->setText(popbin::BinArchive::EntryTypeToString(entry.type).c_str());
 
 		ui.entrySizeLabel->setText(QString::number(entry.size));
 	});
@@ -94,6 +80,28 @@ void FileViewerForm::UpdateLayout() {
 
 		if (!path.isEmpty()) {
 			mBinaryArchive->ExtractAllEntries(path.toStdString());
+		}
+	});
+
+	connect(ui.geometryExtractBtn, &QPushButton::pressed, [&]() {
+		int entryID = ui.filesList->currentItem()->data(Qt::UserRole).toInt();
+		auto& entry = mBinaryArchive->Entries[entryID];
+
+		if (entry.type != popbin::EntryType::GEOMETRY) return;
+
+		QString path = QFileDialog::getExistingDirectory(0, "Save model");
+
+		if (!path.isEmpty()) {
+			if (entry.model != nullptr) {
+				delete entry.model;
+			}
+
+			entry.model = new popbin::GeometryModel(&entry);
+
+			auto modelPtr = static_cast<popbin::GeometryModel*>(entry.model);
+			if (modelPtr) {
+				modelPtr->Export(path.toStdString() + "/" + std::to_string(entryID) + "_model.obj");
+			}
 		}
 	});
 }

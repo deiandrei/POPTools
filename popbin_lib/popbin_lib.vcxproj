@@ -13,12 +13,19 @@
   <ItemGroup>
     <ClInclude Include="BinArchive.h" />
     <ClInclude Include="ByteBuffer.h" />
+    <ClInclude Include="DataModels\AbstractModel.h" />
+    <ClInclude Include="DataModels\DescriptorModel.h" />
+    <ClInclude Include="DataModels\GeometryModel.h" />
+    <ClInclude Include="DataModels\TexturePackModel.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="Entry.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BinArchive.cpp" />
     <ClCompile Include="ByteBuffer.cpp" />
+    <ClCompile Include="DataModels\DescriptorModel.cpp" />
+    <ClCompile Include="DataModels\GeometryModel.cpp" />
+    <ClCompile Include="DataModels\TexturePackModel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dependencies\lzolib\lzo_static_lib.vcxproj">
