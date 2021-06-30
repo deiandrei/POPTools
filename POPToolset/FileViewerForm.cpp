@@ -1,8 +1,10 @@
 #include "FileViewerForm.h"
 #include <QtWidgets/qfiledialog.h>
 #include <qmessagebox.h>
+#include <qpixmap.h>
 
 #include "../popbin_lib/DataModels/GeometryModel.h"
+#include "../popbin_lib/DataModels/TextureModel.h"
 
 FileViewerForm::FileViewerForm(bf::Archive* arc, int id, QWidget *parent) : QWidget(parent) {
 	ui.setupUi(this);
@@ -87,9 +89,19 @@ void FileViewerForm::UpdateLayout() {
 		int entryID = ui.filesList->currentItem()->data(Qt::UserRole).toInt();
 		auto& entry = mBinaryArchive->Entries[entryID];
 
-		if (entry.type != popbin::EntryType::GEOMETRY) return;
-
 		QString path = QFileDialog::getExistingDirectory(0, "Save model");
+
+		if (entry.type == popbin::EntryType::TEXTURE) {
+			auto model = static_cast<popbin::TextureModel*>(entry.model);
+
+			std::ofstream out(path.toStdString() + "/image_" + std::to_string(entryID) + ".tga");
+			out.write((char*)&model->Data[0], model->DataSize);
+			out.close();
+
+			return;
+		}
+
+		if (entry.type != popbin::EntryType::GEOMETRY) return;
 
 		if (!path.isEmpty()) {
 			if (entry.model != nullptr) {
@@ -108,8 +120,6 @@ void FileViewerForm::UpdateLayout() {
 
 void FileViewerForm::ParseText() {
 	ParseRecursive(&mBinaryArchive->Entries[ui.filesList->currentItem()->data(Qt::UserRole).toInt()]);
-
-
 }
 
 void FileViewerForm::ParseRecursive(popbin::Entry* entry) {

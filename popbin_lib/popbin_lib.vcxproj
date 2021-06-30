@@ -16,6 +16,7 @@
     <ClInclude Include="DataModels\AbstractModel.h" />
     <ClInclude Include="DataModels\DescriptorModel.h" />
     <ClInclude Include="DataModels\GeometryModel.h" />
+    <ClInclude Include="DataModels\TextureModel.h" />
     <ClInclude Include="DataModels\TexturePackModel.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="Entry.h" />
@@ -25,6 +26,7 @@
     <ClCompile Include="ByteBuffer.cpp" />
     <ClCompile Include="DataModels\DescriptorModel.cpp" />
     <ClCompile Include="DataModels\GeometryModel.cpp" />
+    <ClCompile Include="DataModels\TextureModel.cpp" />
     <ClCompile Include="DataModels\TexturePackModel.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -82,7 +84,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>

@@ -3,6 +3,7 @@
 #include "DataModels/DescriptorModel.h"
 #include "DataModels/TexturePackModel.h"
 #include "DataModels/GeometryModel.h"
+#include "DataModels/TextureModel.h"
 
 namespace popbin {
 	BinArchive::BinArchive(std::istream& in) {
@@ -353,6 +354,9 @@ namespace popbin {
 		}
 		else if (type == EntryType::TEXTURE_PACK) {
 			entry.model = new TexturePackModel(&entry);
+		}
+		else if (type == EntryType::TEXTURE) {
+			entry.model = new TextureModel(&entry);
 		}
 	}
 
