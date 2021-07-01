@@ -28,8 +28,8 @@ namespace popbin {
 		bb->Read<uint4>(&temp); // unknown
 		bb->Read<uint4>(&temp); // unknown
 
-		bool has_normals = (param2_1) & 1; // first bit
-		bool has_floats = (param2_1 >> 1) & 1; // second bit
+		HasNormals = (param2_1) & 1; // first bit
+		HasFloats = (param2_1 >> 1) & 1; // second bit
 
 		for (int i = 0; i < vertices_count; ++i) {
 			float x, y, z;
@@ -40,7 +40,7 @@ namespace popbin {
 			vertices.push_back(vec3(x, z, -y)); // Z up to Y up fix
 		}
 
-		if (has_normals) {
+		if (HasNormals) {
 			// i gotta find out which mesh has normals in a stable way
 			for (int i = 0; i < vertices_count; ++i) {
 				float x, y, z;
@@ -57,7 +57,7 @@ namespace popbin {
 			}
 		}
 
-		if (floats_count && has_floats) {
+		if (floats_count && HasFloats) {
 			std::vector<float> floats; floats.resize(floats_count);
 			bb->ReadArray(&floats[0], floats_count);
 		}

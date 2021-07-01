@@ -13,6 +13,9 @@ namespace popbin {
 
 			void Export(const std::string& path);
 
+			bool HasNormals;
+			bool HasFloats;
+
 			std::vector<vec3> vertices, normals;
 			std::vector<vec2> uvs;
 			uint4 mesh_count;
