@@ -94,7 +94,9 @@ void FileViewerForm::UpdateLayout() {
 		if (entry.type == popbin::EntryType::TEXTURE) {
 			auto model = static_cast<popbin::TextureModel*>(entry.model);
 
-			std::ofstream out(path.toStdString() + "/image_" + std::to_string(entryID) + ".tga");
+			std::string format = model->Type == popbin::TextureImageType::TEXTURE_DDS ? ".dds" : ".tga";
+
+			std::ofstream out(path.toStdString() + "/image_" + std::to_string(entryID) + format, std::ios::binary);
 			out.write((char*)&model->Data[0], model->DataSize);
 			out.close();
 

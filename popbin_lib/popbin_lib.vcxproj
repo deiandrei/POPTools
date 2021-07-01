@@ -18,6 +18,7 @@
     <ClInclude Include="DataModels\GeometryModel.h" />
     <ClInclude Include="DataModels\TextureModel.h" />
     <ClInclude Include="DataModels\TexturePackModel.h" />
+    <ClInclude Include="DataModels\TexturePaletteModel.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="Entry.h" />
   </ItemGroup>
@@ -28,6 +29,7 @@
     <ClCompile Include="DataModels\GeometryModel.cpp" />
     <ClCompile Include="DataModels\TextureModel.cpp" />
     <ClCompile Include="DataModels\TexturePackModel.cpp" />
+    <ClCompile Include="DataModels\TexturePaletteModel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dependencies\lzolib\lzo_static_lib.vcxproj">

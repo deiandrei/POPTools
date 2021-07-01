@@ -4,6 +4,7 @@
 #include "DataModels/TexturePackModel.h"
 #include "DataModels/GeometryModel.h"
 #include "DataModels/TextureModel.h"
+#include "DataModels/TexturePaletteModel.h"
 
 namespace popbin {
 	BinArchive::BinArchive(std::istream& in) {
@@ -110,6 +111,14 @@ namespace popbin {
 	int BinArchive::SearchEntryByID(int4 id) {
 		for (int i = 0; i < (int)Entries.size(); ++i) {
 			if (Entries[i].fileID == id) return i;
+		}
+
+		return -1;
+	}
+
+	int BinArchive::SearchEntryByIDandType(int4 id, EntryType type) {
+		for (int i = 0; i < (int)Entries.size(); ++i) {
+			if (Entries[i].fileID == id && Entries[i].type == type) return i;
 		}
 
 		return -1;
@@ -357,6 +366,9 @@ namespace popbin {
 		}
 		else if (type == EntryType::TEXTURE) {
 			entry.model = new TextureModel(&entry);
+		}
+		else if (type == EntryType::TEXTURE_PALETTE) {
+			entry.model = new TexturePaletteModel(&entry);
 		}
 	}
 

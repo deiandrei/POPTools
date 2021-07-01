@@ -40,6 +40,7 @@ namespace popbin {
 			static std::string EntryTypeToString(EntryType type);
 
 			int SearchEntryByID(int4 id);
+			int SearchEntryByIDandType(int4 id, EntryType type); // useful for finding texture headers or palettes
 
 			ByteBuffer* GetBuffer() { return mDataBuffer; }
 
