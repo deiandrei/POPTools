@@ -51,6 +51,9 @@
     <ClInclude Include="DataModels\TexturePaletteModel.h">
       <Filter>Header Files\DataModels</Filter>
     </ClInclude>
+    <ClInclude Include="DataModels\GameActorModel.h">
+      <Filter>Header Files\DataModels</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ByteBuffer.cpp">
@@ -72,6 +75,9 @@
       <Filter>Source Files\DataModels</Filter>
     </ClCompile>
     <ClCompile Include="DataModels\TexturePaletteModel.cpp">
+      <Filter>Source Files\DataModels</Filter>
+    </ClCompile>
+    <ClCompile Include="DataModels\GameActorModel.cpp">
       <Filter>Source Files\DataModels</Filter>
     </ClCompile>
   </ItemGroup>

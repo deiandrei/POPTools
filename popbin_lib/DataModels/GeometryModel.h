@@ -14,7 +14,7 @@ namespace popbin {
 			void Export(const std::string& path);
 
 			bool HasNormals;
-			bool HasFloats;
+			bool HasColors;
 
 			std::vector<vec3> vertices, normals;
 			std::vector<vec2> uvs;

@@ -8,6 +8,8 @@ namespace popbin {
 		BinArchive* archive = entry->parentArchive;
 		ByteBuffer* bb = new ByteBuffer(entry->data, entry->size);
 
+		PaletteID = -1;
+
 		int idd = archive->SearchEntryByID(entry->fileID);
 
 		uint4 temp, type;

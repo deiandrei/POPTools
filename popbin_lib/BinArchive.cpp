@@ -5,6 +5,7 @@
 #include "DataModels/GeometryModel.h"
 #include "DataModels/TextureModel.h"
 #include "DataModels/TexturePaletteModel.h"
+#include "DataModels/GameActorModel.h"
 
 namespace popbin {
 	BinArchive::BinArchive(std::istream& in) {
@@ -369,6 +370,12 @@ namespace popbin {
 		}
 		else if (type == EntryType::TEXTURE_PALETTE) {
 			entry.model = new TexturePaletteModel(&entry);
+		}
+		else if (type == EntryType::GAO) {
+			entry.model = new GameActorModel(&entry);
+		}
+		else if (type == EntryType::GEOMETRY) {
+			entry.model = new GeometryModel(&entry);
 		}
 	}
 

@@ -29,7 +29,7 @@ namespace popbin {
 		bb->Read<uint4>(&temp); // unknown
 
 		HasNormals = (param2_1) & 1; // first bit
-		HasFloats = (param2_1 >> 1) & 1; // second bit
+		HasColors = (param2_1 >> 1) & 1; // second bit
 
 		for (int i = 0; i < vertices_count; ++i) {
 			float x, y, z;
@@ -57,7 +57,7 @@ namespace popbin {
 			}
 		}
 
-		if (floats_count && HasFloats) {
+		if (floats_count && HasColors) {
 			std::vector<float> floats; floats.resize(floats_count);
 			bb->ReadArray(&floats[0], floats_count);
 		}

@@ -15,6 +15,7 @@
     <ClInclude Include="ByteBuffer.h" />
     <ClInclude Include="DataModels\AbstractModel.h" />
     <ClInclude Include="DataModels\DescriptorModel.h" />
+    <ClInclude Include="DataModels\GameActorModel.h" />
     <ClInclude Include="DataModels\GeometryModel.h" />
     <ClInclude Include="DataModels\TextureModel.h" />
     <ClInclude Include="DataModels\TexturePackModel.h" />
@@ -26,6 +27,7 @@
     <ClCompile Include="BinArchive.cpp" />
     <ClCompile Include="ByteBuffer.cpp" />
     <ClCompile Include="DataModels\DescriptorModel.cpp" />
+    <ClCompile Include="DataModels\GameActorModel.cpp" />
     <ClCompile Include="DataModels\GeometryModel.cpp" />
     <ClCompile Include="DataModels\TextureModel.cpp" />
     <ClCompile Include="DataModels\TexturePackModel.cpp" />

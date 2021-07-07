@@ -38,8 +38,10 @@ void FileViewerForm::UpdateLayout() {
 	for (int i = 0; i < (int)mBinaryArchive->Entries.size(); ++i) {
 		auto& entry = mBinaryArchive->Entries[i];
 
+		int strrr = strlen(entry.name);
+
 		std::stringstream str;
-		str << "[" << entry.entry_beginPos << "] -> [" << entry.entry_endPos << "] --- [" << i << "] " << popbin::BinArchive::EntryTypeToString(entry.type) << "_" << std::hex << entry.fileID <<  strlen(entry.name) ? "_" + std::string(entry.name) : "";
+		str << "[" << entry.entry_beginPos << "] -> [" << entry.entry_endPos << "] --- [" << i << "] " << popbin::BinArchive::EntryTypeToString(entry.type) << "_" << std::hex << entry.fileID << std::dec << (strlen(entry.name) > 0 ? "_" + std::string(entry.name) : "");
 
 		QListWidgetItem* item = new QListWidgetItem(ui.filesList);
 		item->setText(str.str().c_str());
@@ -49,12 +51,41 @@ void FileViewerForm::UpdateLayout() {
 	}
 
 	connect(ui.filesList, &QListWidget::itemSelectionChanged, [&]() {
+		ui.listWidget->clear();
+
 		int entryID = ui.filesList->currentItem()->data(Qt::UserRole).toInt();
 		auto& entry = mBinaryArchive->Entries[entryID];
 
 		ui.entryTypeLabel->setText(popbin::BinArchive::EntryTypeToString(entry.type).c_str());
 
 		ui.entrySizeLabel->setText(QString::number(entry.size));
+
+		if (entry.type == popbin::EntryType::GAO) {
+			ui.listWidget->addItem("Lol");
+		}
+		else if (entry.type == popbin::EntryType::TEXTURE) {
+			auto model = (popbin::TextureModel*)entry.model;
+
+			int palleteid = -1;
+			if (model->PaletteID != -1) palleteid = mBinaryArchive->SearchEntryByIDandType(model->PaletteID, popbin::EntryType::TEXTURE_PALETTE);
+
+			ui.listWidget->addItem("Width: " + QString::number(model->Width));
+			ui.listWidget->addItem("Height: " + QString::number(model->Height));
+			ui.listWidget->addItem("Type: " + QString::number(model->Type));
+			ui.listWidget->addItem("Palette: " + QString::number(palleteid));
+		}
+		else if (entry.type == popbin::EntryType::GEOMETRY) {
+			auto model = (popbin::GeometryModel*)entry.model;
+
+			ui.listWidget->addItem("Vertices: " + QString::number(model->vertices.size()));
+			ui.listWidget->addItem("Mesh Count: " + QString::number(model->mesh_count));
+			for (int i = 0; i < model->mesh_count; ++i) {
+				ui.listWidget->addItem("Indices Count [" + QString::number(i) + "]: " + QString::number(model->indices_verts[i].size()));
+			}
+			ui.listWidget->addItem("Has Normals: " + QString::number(model->HasNormals));
+			ui.listWidget->addItem("Has Colors: " + QString::number(model->HasNormals));
+		}
+
 	});
 
 	connect(ui.tryTextParse, &QPushButton::pressed, this, &FileViewerForm::ParseText);
@@ -106,12 +137,6 @@ void FileViewerForm::UpdateLayout() {
 		if (entry.type != popbin::EntryType::GEOMETRY) return;
 
 		if (!path.isEmpty()) {
-			if (entry.model != nullptr) {
-				delete entry.model;
-			}
-
-			entry.model = new popbin::GeometryModel(&entry);
-
 			auto modelPtr = static_cast<popbin::GeometryModel*>(entry.model);
 			if (modelPtr) {
 				modelPtr->Export(path.toStdString() + "/" + std::to_string(entryID) + "_model.obj");
