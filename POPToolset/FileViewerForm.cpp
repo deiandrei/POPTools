@@ -2,9 +2,12 @@
 #include <QtWidgets/qfiledialog.h>
 #include <qmessagebox.h>
 #include <qpixmap.h>
+#include <qprocess.h>
+#include <qlineedit.h>
 
 #include "../popbin_lib/DataModels/GeometryModel.h"
 #include "../popbin_lib/DataModels/TextureModel.h"
+#include "../popbin_lib/DataModels/TextureInfoModel.h"
 
 FileViewerForm::FileViewerForm(bf::Archive* arc, int id, QWidget *parent) : QWidget(parent) {
 	ui.setupUi(this);
@@ -41,7 +44,7 @@ void FileViewerForm::UpdateLayout() {
 		int strrr = strlen(entry.name);
 
 		std::stringstream str;
-		str << "[" << entry.entry_beginPos << "] -> [" << entry.entry_endPos << "] --- [" << i << "] " << popbin::BinArchive::EntryTypeToString(entry.type) << "_" << std::hex << entry.fileID << std::dec << (strlen(entry.name) > 0 ? "_" + std::string(entry.name) : "");
+		str << "[" << entry.entry_beginPos << "] -> [" << entry.entry_endPos << "] " << entry.GetDebugName(i);
 
 		QListWidgetItem* item = new QListWidgetItem(ui.filesList);
 		item->setText(str.str().c_str());
@@ -84,6 +87,15 @@ void FileViewerForm::UpdateLayout() {
 			}
 			ui.listWidget->addItem("Has Normals: " + QString::number(model->HasNormals));
 			ui.listWidget->addItem("Has Colors: " + QString::number(model->HasNormals));
+		}
+		else if (entry.type == popbin::EntryType::TEXTURE_INFO) {
+			auto model = (popbin::TextureInfoModel*)entry.model;
+
+			ui.listWidget->addItem("Texture Count: " + QString::number(model->TextureList.size()));
+			for (int i = 0; i < (int)model->TextureList.size(); ++i) {
+				ui.listWidget->addItem("Texture " + QString::number(i) + ": " + QString::number(model->TextureList[i].second));
+			}
+
 		}
 
 	});
@@ -140,6 +152,35 @@ void FileViewerForm::UpdateLayout() {
 			auto modelPtr = static_cast<popbin::GeometryModel*>(entry.model);
 			if (modelPtr) {
 				modelPtr->Export(path.toStdString() + "/" + std::to_string(entryID) + "_model.obj");
+			}
+		}
+	});
+
+	connect(ui.openInHexBtn, &QPushButton::pressed, [&]() {
+		int entryID = ui.filesList->currentItem()->data(Qt::UserRole).toInt();
+		auto& entry = mBinaryArchive->Entries[entryID];
+
+		const QString hxdPath = "C:\\Program Files\\HxD\\HxD.exe";
+
+		QProcess* process = new QProcess(this);
+		
+		connect(process, &QProcess::errorOccurred, [=](QProcess::ProcessError error)
+		{
+			std::cout << "error enum val = " << error << "\n";
+		});
+
+		process->startDetached(hxdPath);
+	});
+
+	connect(ui.searchInput, &QLineEdit::textChanged, [&](QString text) {
+		for (int i = 0; i < ui.filesList->count(); ++i) {
+			auto item = ui.filesList->item(i);
+
+			if (text.isEmpty()) {
+				item->setHidden(false);
+			}
+			else {
+				item->setHidden(!item->text().contains(text));
 			}
 		}
 	});

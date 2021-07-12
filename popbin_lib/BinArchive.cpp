@@ -6,6 +6,7 @@
 #include "DataModels/TextureModel.h"
 #include "DataModels/TexturePaletteModel.h"
 #include "DataModels/GameActorModel.h"
+#include "DataModels/TextureInfoModel.h"
 
 namespace popbin {
 	BinArchive::BinArchive(std::istream& in) {
@@ -46,26 +47,6 @@ namespace popbin {
 		uint4 length = (uint4)in.tellg();
 		in.seekg(lastPos);
 		return length;
-	}
-
-	EntryType BinArchive::IntToEntryType(int4 type) {
-		if (type == 1) { //=1
-			return EntryType::GEOMETRY;
-		}
-		else if (type == 4) { //texturepack
-			return EntryType::TEXTURE_PACK;
-		}
-		else if (type == 5) { //textureinfo ??
-			return EntryType::TEXTURE_INFO;
-		}
-		else if (type == 0x0FF7C0DE) {
-			return EntryType::TERMINATOR;
-		}
-		else if (type == 0x6F61672E) { //.gao
-			return EntryType::GAO;
-		}
-
-		return EntryType::UNKNOWN;
 	}
 
 	std::string BinArchive::EntryTypeToString(EntryType type) {
@@ -110,7 +91,7 @@ namespace popbin {
 	}
 
 	int BinArchive::SearchEntryByID(int4 id) {
-		for (int i = 0; i < (int)Entries.size(); ++i) {
+		for (int i = (int)Entries.size() - 1; i >= 0; --i) {
 			if (Entries[i].fileID == id) return i;
 		}
 
@@ -350,10 +331,14 @@ namespace popbin {
 			else {
 				entry.type = EntryType::EMPTY;
 			}
+		}
+
+		// Parse all entries
+		for (int i = 0; i < (int)Entries.size(); i++) {
+			Entry& entry = Entries[i];
 
 			ParseEntry(i, entry.type);
 		}
-
 	}
 
 	void BinArchive::ParseEntry(int id, EntryType type) {
@@ -376,6 +361,9 @@ namespace popbin {
 		}
 		else if (type == EntryType::GEOMETRY) {
 			entry.model = new GeometryModel(&entry);
+		}
+		else if (type == EntryType::TEXTURE_INFO) {
+			entry.model = new TextureInfoModel(&entry);
 		}
 	}
 

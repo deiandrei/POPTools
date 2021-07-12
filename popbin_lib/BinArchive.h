@@ -36,7 +36,6 @@ namespace popbin {
 
 			static uint4 GetStreamSize(std::istream& in);
 
-			static EntryType IntToEntryType(int4 type);
 			static std::string EntryTypeToString(EntryType type);
 
 			int SearchEntryByID(int4 id);

@@ -17,6 +17,7 @@
     <ClInclude Include="DataModels\DescriptorModel.h" />
     <ClInclude Include="DataModels\GameActorModel.h" />
     <ClInclude Include="DataModels\GeometryModel.h" />
+    <ClInclude Include="DataModels\TextureInfoModel.h" />
     <ClInclude Include="DataModels\TextureModel.h" />
     <ClInclude Include="DataModels\TexturePackModel.h" />
     <ClInclude Include="DataModels\TexturePaletteModel.h" />
@@ -29,9 +30,11 @@
     <ClCompile Include="DataModels\DescriptorModel.cpp" />
     <ClCompile Include="DataModels\GameActorModel.cpp" />
     <ClCompile Include="DataModels\GeometryModel.cpp" />
+    <ClCompile Include="DataModels\TextureInfoModel.cpp" />
     <ClCompile Include="DataModels\TextureModel.cpp" />
     <ClCompile Include="DataModels\TexturePackModel.cpp" />
     <ClCompile Include="DataModels\TexturePaletteModel.cpp" />
+    <ClCompile Include="Entry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dependencies\lzolib\lzo_static_lib.vcxproj">

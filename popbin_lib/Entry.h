@@ -54,6 +54,8 @@ namespace popbin {
 			entry_beginPos = entry_endPos = data_beginPos = 0;
 		}
 
+		std::string GetDebugName(int id = -1);
+
 	};
 
 	struct EntryLink {
