@@ -8,6 +8,8 @@
 #include "../popbin_lib/DataModels/GeometryModel.h"
 #include "../popbin_lib/DataModels/TextureModel.h"
 #include "../popbin_lib/DataModels/TextureInfoModel.h"
+#include "../popbin_lib/DataModels/TexturePackModel.h"
+#include "../popbin_lib/DataModels/GameActorModel.h"
 
 FileViewerForm::FileViewerForm(bf::Archive* arc, int id, QWidget *parent) : QWidget(parent) {
 	ui.setupUi(this);
@@ -64,7 +66,20 @@ void FileViewerForm::UpdateLayout() {
 		ui.entrySizeLabel->setText(QString::number(entry.size));
 
 		if (entry.type == popbin::EntryType::GAO) {
-			ui.listWidget->addItem("Lol");
+			auto model = (popbin::GameActorModel*)entry.model;
+
+			ui.listWidget->addItem("Has 12 floats?: " + QString::number(model->Has12Floats));
+			ui.listWidget->addItem("Has all same floats?: " + QString::number(model->AllFloatsTheSame));
+			ui.listWidget->addItem("Has paarent gao?: " + QString::number(model->HasParentGao));
+
+			for (int i = 0; i < (int)model->Vectors.size(); ++i) {
+				ui.listWidget->addItem("Vector " + QString::number(i) + ".x: " + QString::number(model->Vectors[i].x));
+				ui.listWidget->addItem("Vector " + QString::number(i) + ".y: " + QString::number(model->Vectors[i].y));
+				ui.listWidget->addItem("Vector " + QString::number(i) + ".z: " + QString::number(model->Vectors[i].z));
+			}
+
+			ui.listWidget->addItem("Geometry file " + QString::number(model->GeometryEntry.second));
+			ui.listWidget->addItem("Texture file " + QString::number(model->TextureEntry.second));
 		}
 		else if (entry.type == popbin::EntryType::TEXTURE) {
 			auto model = (popbin::TextureModel*)entry.model;
@@ -74,16 +89,18 @@ void FileViewerForm::UpdateLayout() {
 
 			ui.listWidget->addItem("Width: " + QString::number(model->Width));
 			ui.listWidget->addItem("Height: " + QString::number(model->Height));
-			ui.listWidget->addItem("Type: " + QString::number(model->Type));
+			ui.listWidget->addItem("Type: " + QString(model->FileExtension().c_str()));
 			ui.listWidget->addItem("Palette: " + QString::number(palleteid));
 		}
 		else if (entry.type == popbin::EntryType::GEOMETRY) {
+			if (entry.model == nullptr) entry.model = new popbin::GeometryModel(&entry);
 			auto model = (popbin::GeometryModel*)entry.model;
 
 			ui.listWidget->addItem("Vertices: " + QString::number(model->vertices.size()));
 			ui.listWidget->addItem("Mesh Count: " + QString::number(model->mesh_count));
 			for (int i = 0; i < model->mesh_count; ++i) {
-				ui.listWidget->addItem("Indices Count [" + QString::number(i) + "]: " + QString::number(model->indices_verts[i].size()));
+				ui.listWidget->addItem("Material ID [" + QString::number(i) + "]: " + QString::number(model->meshparts[i].materialId));
+				ui.listWidget->addItem("Indices Count [" + QString::number(i) + "]: " + QString::number(model->meshparts[i].indices.size()));
 			}
 			ui.listWidget->addItem("Has Normals: " + QString::number(model->HasNormals));
 			ui.listWidget->addItem("Has Colors: " + QString::number(model->HasNormals));
@@ -94,6 +111,18 @@ void FileViewerForm::UpdateLayout() {
 			ui.listWidget->addItem("Texture Count: " + QString::number(model->TextureList.size()));
 			for (int i = 0; i < (int)model->TextureList.size(); ++i) {
 				ui.listWidget->addItem("Texture " + QString::number(i) + ": " + QString::number(model->TextureList[i].second));
+			}
+
+		}
+		else if (entry.type == popbin::EntryType::TEXTURE_PACK) {
+			auto model = (popbin::TexturePackModel*)entry.model;
+
+			int i = 0;
+			ui.listWidget->addItem("Texture Count: " + QString::number(model->TextureList.size()));
+			for (auto tex : model->TextureList) {
+				ui.listWidget->addItem("Texture " + QString::number(i) + ": " + QString::number(tex.second));
+
+				i++;
 			}
 
 		}
@@ -139,10 +168,21 @@ void FileViewerForm::UpdateLayout() {
 
 			std::string format = model->Type == popbin::TextureImageType::TEXTURE_DDS ? ".dds" : ".tga";
 
-			std::ofstream out(path.toStdString() + "/image_" + std::to_string(entryID) + format, std::ios::binary);
-			out.write((char*)&model->Data[0], model->DataSize);
-			out.close();
+			model->Export(path.toStdString() + "/image_" + std::to_string(entryID));
+			return;
+		}
 
+		if (entry.type == popbin::EntryType::GAO) {
+			auto model = static_cast<popbin::GameActorModel*>(entry.model);
+
+			model->Export(path.toStdString());
+			return;
+		}
+
+		if (entry.type == popbin::EntryType::TEXTURE_PACK) {
+			auto model = static_cast<popbin::TexturePackModel*>(entry.model);
+
+			model->Export(path.toStdString());
 			return;
 		}
 

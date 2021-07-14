@@ -17,6 +17,10 @@ namespace popbin {
 		public:
 			TextureModel(Entry* entry);
 
+			void Export(const std::string& file) override;
+			
+			std::string FileExtension();
+
 			byte1* Data;
 			uint4 DataSize;
 			uint2 Width;

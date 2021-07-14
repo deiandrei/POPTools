@@ -9,6 +9,8 @@ namespace popbin {
 		public:
 			AbstractModel(Entry* entry) { mEntry = entry; }
 
+			virtual void Export(const std::string& file) { }
+
 		protected:
 			Entry* mEntry;
 

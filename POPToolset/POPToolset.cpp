@@ -39,6 +39,19 @@ POPToolset::POPToolset(QWidget *parent) : QMainWindow(parent) {
 		}
 	});
 
+	/*connect(ui.searchInput, &QLineEdit::textChanged, [&](QString text) {
+		for (int i = 0; i < ui.fsTree->; ++i) {
+			auto item = ui.filesList->item(i);
+
+			if (text.isEmpty()) {
+				item->setHidden(false);
+			}
+			else {
+				item->setHidden(!item->text().contains(text));
+			}
+		}
+	});*/
+
 	ui.fsTree->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui.fsTree, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(onCustomContextMenu(const QPoint&)));
 }

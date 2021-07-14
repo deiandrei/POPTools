@@ -9,6 +9,8 @@ namespace popbin {
 		public:
 			TexturePackModel(Entry* entry);
 
+			virtual void Export(const std::string& file) override;
+
 			std::map<uint4, int> TextureList;
 
 	};

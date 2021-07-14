@@ -55,6 +55,7 @@ namespace popbin {
 		}
 
 		std::string GetDebugName(int id = -1);
+		std::string GetFileIdString() { std::stringstream ss; ss << std::hex << fileID; return ss.str(); }
 
 	};
 

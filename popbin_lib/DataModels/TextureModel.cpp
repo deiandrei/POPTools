@@ -124,4 +124,15 @@ namespace popbin {
 		}
 	}
 
+	void TextureModel::Export(const std::string& file) {
+		std::ofstream out(file, std::ios::binary);
+
+		out.write((char*)&Data[0], DataSize);
+		out.close();
+	}
+
+	std::string TextureModel::FileExtension() {
+		return Type == TextureImageType::TEXTURE_DDS ? "dds" : "tga";
+	}
+
 }

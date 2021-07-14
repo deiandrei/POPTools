@@ -8,7 +8,9 @@ namespace popbin {
 		BinArchive* archive = entry->parentArchive;
 		ByteBuffer* bb = new ByteBuffer(entry->data, entry->size);
 
-		///// 
+		MaterialExportName = "";
+
+		/////
 		uint4 type, temp, param1, param3;
 		uint2 param2_1, param2_2;
 		bb->Read<uint4>(&type);
@@ -71,22 +73,21 @@ namespace popbin {
 			uvs.push_back(vec2(x, y));
 		}
 
-		indices_verts.resize(mesh_count);
-		indices_uvs.resize(mesh_count);
+		meshparts.resize(mesh_count);
 		for (int i = 0; i < mesh_count; i++) {
 			uint4 faces_count;
 			uint4 spacer; // dunno what it is but its placed after indices count and after every triangle (which has 6 bytes for 3 uint2 indices and 6 bytes for 3 uint2 uvindices = 12 bytes)
 			bb->Read<uint4>(&faces_count); // read indices count
-			bb->Read<uint4>(&spacer); // read spacer
+			bb->Read<uint4>(&meshparts[i].materialId); // read materialId ??
 
-			indices_verts[i].push_back(faces_count);
+			meshparts[i].indices.push_back(faces_count);
 		}
 
 		for (int i = 0; i < mesh_count; i++) {
 			uint4 spacer; // damn spacer
 
-			int faces_count = indices_verts[i][0];
-			indices_verts[i].clear();
+			int faces_count = meshparts[i].indices[0];
+			meshparts[i].indices.clear();
 
 			for (int j = 0; j < faces_count; j++) {
 				int2 v1, v2, v3, vt1, vt2, vt3;
@@ -101,13 +102,13 @@ namespace popbin {
 
 				bb->Read<uint4>(&spacer); // read spacer
 
-				indices_verts[i].push_back(v1 + 1);
-				indices_verts[i].push_back(v2 + 1);
-				indices_verts[i].push_back(v3 + 1);
+				meshparts[i].indices.push_back(v1 + 1);
+				meshparts[i].indices.push_back(v2 + 1);
+				meshparts[i].indices.push_back(v3 + 1);
 
-				indices_uvs[i].push_back(vt1 + 1);
-				indices_uvs[i].push_back(vt2 + 1);
-				indices_uvs[i].push_back(vt3 + 1);
+				meshparts[i].uv_pairs.push_back(vt1 + 1);
+				meshparts[i].uv_pairs.push_back(vt2 + 1);
+				meshparts[i].uv_pairs.push_back(vt3 + 1);
 			}
 		}
 	}
@@ -123,7 +124,9 @@ namespace popbin {
 		out.setf(std::ios::fixed, std::ios::floatfield);
 		out.setf(std::ios::showpoint);
 
-		out << "# POPBin generated mesh file\n\n";
+		out << "# POPBin generated mesh file\n";
+		if (!MaterialExportName.empty()) out << "mtllib mtl_" << MaterialExportName << ".mtl\n";
+		out << "\n";
 
 		for (auto v : vertices) {
 			out << "v " << v.x << " " << v.y << " " << v.z << "\n";
@@ -145,9 +148,11 @@ namespace popbin {
 
 		for (int j = 0; j < mesh_count; j++) {
 			out << "g " << j << "\n";
-			for (int i = 0; i < indices_verts[j].size(); i += 3) {
+			if (!MaterialExportName.empty()) out << "usemtl " << MaterialExportName << "_" << meshparts[j].materialId << "\n";
+
+			for (int i = 0; i < meshparts[j].indices.size(); i += 3) {
 				//out << "f " << indices_verts[i] << "/" << indices_uvs[i] << "/" << indices_normals[i] << " " << indices_verts[i + 1] << "/" << indices_uvs[i + 1] << "/" << indices_normals[i + 1] << " " << indices_verts[i + 2] << "/" << indices_uvs[i + 2] << "/" << indices_normals[i + 2] << "\n";
-				out << "f " << indices_verts[j][i] << "/" << indices_uvs[j][i] << "/" << indices_verts[j][i] << " " << indices_verts[j][i + 1] << "/" << indices_uvs[j][i + 1] << "/" << indices_verts[j][i + 1] << " " << indices_verts[j][i + 2] << "/" << indices_uvs[j][i + 2] << "/" << indices_verts[j][i + 2] << "\n";
+				out << "f " << meshparts[j].indices[i] << "/" << meshparts[j].uv_pairs[i] << "/" << meshparts[j].indices[i] << " " << meshparts[j].indices[i + 1] << "/" << meshparts[j].uv_pairs[i + 1] << "/" << meshparts[j].indices[i + 1] << " " << meshparts[j].indices[i + 2] << "/" << meshparts[j].uv_pairs[i + 2] << "/" << meshparts[j].indices[i + 2] << "\n";
 				//out << "f " << indices_verts[i] << " " << indices_verts[i + 1] << " " << indices_verts[i + 2] << "\n";
 			}
 			out << "\n";

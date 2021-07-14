@@ -360,7 +360,7 @@ namespace popbin {
 			entry.model = new GameActorModel(&entry);
 		}
 		else if (type == EntryType::GEOMETRY) {
-			entry.model = new GeometryModel(&entry);
+			//entry.model = new GeometryModel(&entry);
 		}
 		else if (type == EntryType::TEXTURE_INFO) {
 			entry.model = new TextureInfoModel(&entry);

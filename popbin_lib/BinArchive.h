@@ -26,6 +26,8 @@ namespace std {
 
 namespace popbin {
 
+	using LinkedEntry = std::pair<uint4, int>;
+
 	class BinArchive {
 		public:
 			BinArchive(std::istream& in);

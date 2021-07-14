@@ -52,6 +52,8 @@ class ByteBuffer {
 
 		byte1* Data() { return mByteContainer; }
 
+		static bool GetBitFromByte(int bitId, const byte1& byte);
+
 	private:
 		byte1* mByteContainer;
 		uint4 mPosition, mSize;

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>750</width>
+    <width>556</width>
     <height>588</height>
    </rect>
   </property>
@@ -17,6 +17,9 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTreeView" name="fsTree"/>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="searchInput"/>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
@@ -49,8 +52,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>750</width>
-     <height>26</height>
+     <width>556</width>
+     <height>21</height>
     </rect>
    </property>
   </widget>
