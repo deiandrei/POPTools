@@ -74,10 +74,10 @@ namespace popbin {
 			int texId = texInfoModel->TextureList[0].second;
 			if (texId != -1) {
 				auto texModel = (TextureModel*)archive->Entries[texId].model;
-				texModel->Export(file + "." + texModel->FileExtension());
+				texModel->Export(file);
 			}
 
-			geomModel->Export(file + "/" + std::string(mEntry->name) + ".obj");
+			geomModel->Export(file + std::string(mEntry->name) + ".obj");
 		}
 		else if(textureEntry.type == EntryType::TEXTURE_PACK) {
 			auto texPackModel = (TexturePackModel*)textureEntry.model;

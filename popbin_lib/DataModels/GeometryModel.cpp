@@ -114,7 +114,8 @@ namespace popbin {
 	}
 
 	void GeometryModel::Export(const std::string& path) {
-		std::ofstream out(path);
+		std::string finalPath = path + "_model.obj";
+		std::ofstream out(finalPath);
 
 		if (!out.is_open()) {
 			std::cout << "its bad.";

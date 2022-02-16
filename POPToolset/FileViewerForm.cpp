@@ -158,17 +158,24 @@ void FileViewerForm::UpdateLayout() {
 	});
 
 	connect(ui.geometryExtractBtn, &QPushButton::pressed, [&]() {
+		if (!ui.filesList->currentItem()) {
+			QMessageBox::critical(0, "Error!", "No entry selected!");
+			return;
+		}
+
 		int entryID = ui.filesList->currentItem()->data(Qt::UserRole).toInt();
 		auto& entry = mBinaryArchive->Entries[entryID];
 
 		QString path = QFileDialog::getExistingDirectory(0, "Save model");
 
-		if (entry.type == popbin::EntryType::TEXTURE) {
+		entry.model->Export(path.toStdString() + "/" + std::to_string(entryID));
+
+		/*if (entry.type == popbin::EntryType::TEXTURE) {
 			auto model = static_cast<popbin::TextureModel*>(entry.model);
 
 			std::string format = model->Type == popbin::TextureImageType::TEXTURE_DDS ? ".dds" : ".tga";
 
-			model->Export(path.toStdString() + "/image_" + std::to_string(entryID));
+			model->Export(path.toStdString());
 			return;
 		}
 
@@ -193,23 +200,31 @@ void FileViewerForm::UpdateLayout() {
 			if (modelPtr) {
 				modelPtr->Export(path.toStdString() + "/" + std::to_string(entryID) + "_model.obj");
 			}
-		}
+		}*/
 	});
 
 	connect(ui.openInHexBtn, &QPushButton::pressed, [&]() {
+		if (!ui.filesList->currentItem()) {
+			QMessageBox::critical(0, "Error!", "No entry selected!");
+			return;
+		}
+
+		const QString hxdPath = "C:\\Program Files\\HxD\\HxD.exe";
 		int entryID = ui.filesList->currentItem()->data(Qt::UserRole).toInt();
 		auto& entry = mBinaryArchive->Entries[entryID];
 
-		const QString hxdPath = "C:\\Program Files\\HxD\\HxD.exe";
+		// export the entry to temp
+		std::stringstream entryFileName;
+		entryFileName << entryID << "_" << std::hex << entry.fileID << ".rawbin";
+		std::string finalPath = QDir::currentPath().toStdString() + "/" + entryFileName.str();
 
+		mBinaryArchive->ExtractEntry(entryID, QDir::currentPath().toStdString());
+
+		QStringList parameters;
+		parameters << QString(finalPath.c_str());
 		QProcess* process = new QProcess(this);
-		
-		connect(process, &QProcess::errorOccurred, [=](QProcess::ProcessError error)
-		{
-			std::cout << "error enum val = " << error << "\n";
-		});
 
-		process->startDetached(hxdPath);
+		process->startDetached(hxdPath, parameters);
 	});
 
 	connect(ui.searchInput, &QLineEdit::textChanged, [&](QString text) {
@@ -227,7 +242,7 @@ void FileViewerForm::UpdateLayout() {
 }
 
 void FileViewerForm::ParseText() {
-	ParseRecursive(&mBinaryArchive->Entries[ui.filesList->currentItem()->data(Qt::UserRole).toInt()]);
+	//ParseRecursive(&mBinaryArchive->Entries[ui.filesList->currentItem()->data(Qt::UserRole).toInt()]);
 }
 
 void FileViewerForm::ParseRecursive(popbin::Entry* entry) {

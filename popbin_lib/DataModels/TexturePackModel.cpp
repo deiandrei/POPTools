@@ -54,7 +54,7 @@ namespace popbin {
 
 				std::stringstream ss;
 				ss << texEntry.GetFileIdString() << "." << model->FileExtension();
-				model->Export(file + "/" + ss.str());
+				model->Export(file + "_" + std::to_string(i));
 			}
 			i++;
 		}

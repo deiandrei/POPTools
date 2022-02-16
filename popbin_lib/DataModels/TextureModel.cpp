@@ -125,7 +125,8 @@ namespace popbin {
 	}
 
 	void TextureModel::Export(const std::string& file) {
-		std::ofstream out(file, std::ios::binary);
+		std::string finalPath = file + "_texture." + FileExtension();
+		std::ofstream out(finalPath, std::ios::binary);
 
 		out.write((char*)&Data[0], DataSize);
 		out.close();
