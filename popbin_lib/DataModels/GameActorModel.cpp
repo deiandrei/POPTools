@@ -51,10 +51,15 @@ namespace popbin {
 			uint4 geometry_fileId, textureInfo_fileId;
 			bb->Read<uint4>(&geometry_fileId);
 			bb->Read<uint4>(&textureInfo_fileId);
+			bb->Read<uint4>(&MaybeScriptEntry);
 
 			GeometryEntry = { geometry_fileId, archive->SearchEntryByID(geometry_fileId) };
 			TextureEntry = { textureInfo_fileId, archive->SearchEntryByID(textureInfo_fileId) };
 		}
+
+		bb->ReadArray<byte1>(UnknownColorBytes1, 6);
+		bb->Read<uint4>(&WhateverCounter1);
+		bb->Position() += WhateverCounter1 * 4; // skipped the colors or whatever they are
 	}
 
 	void GameActorModel::Export(const std::string& file) {

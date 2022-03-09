@@ -1,11 +1,15 @@
 #include "POPToolset.h"
 #include "FSItem.h"
+#include <qsortfilterproxymodel.h>
 
 POPToolset::POPToolset(QWidget *parent) : QMainWindow(parent) {
 	ui.setupUi(this);
 
 	mCurrentFile = "";
 	mArchive = nullptr;
+
+	mSortModel = new QSortFilterProxyModel(this);
+	mSortModel->setRecursiveFilteringEnabled(true);
 
 	connect(ui.loadBtn, &QPushButton::clicked, [&]() {
 		QString path = QFileDialog::getOpenFileName(0, "Load archive", "", "BF files (*.bf)");
@@ -21,7 +25,8 @@ POPToolset::POPToolset(QWidget *parent) : QMainWindow(parent) {
 			if (mArchive->IsLoaded()) {
 				//finished with bf reading
 				FSTreeModel* fs_model = new FSTreeModel(mArchive);
-				ui.fsTree->setModel(fs_model);
+				mSortModel->setSourceModel(fs_model);
+				ui.fsTree->setModel(mSortModel);
 			}
 			else delete mArchive;
 		}
@@ -39,18 +44,9 @@ POPToolset::POPToolset(QWidget *parent) : QMainWindow(parent) {
 		}
 	});
 
-	/*connect(ui.searchInput, &QLineEdit::textChanged, [&](QString text) {
-		for (int i = 0; i < ui.fsTree->; ++i) {
-			auto item = ui.filesList->item(i);
-
-			if (text.isEmpty()) {
-				item->setHidden(false);
-			}
-			else {
-				item->setHidden(!item->text().contains(text));
-			}
-		}
-	});*/
+	connect(ui.searchInput, &QLineEdit::textChanged, [&](QString text) {
+		mSortModel->setFilterFixedString(text);
+	});
 
 	ui.fsTree->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui.fsTree, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(onCustomContextMenu(const QPoint&)));

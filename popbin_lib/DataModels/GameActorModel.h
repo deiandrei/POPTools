@@ -24,6 +24,12 @@ namespace popbin {
 			LinkedEntry GeometryEntry;
 			LinkedEntry TextureEntry;
 
+			// Unknowns
+			uint4 MaybeScriptEntry;
+			byte1 UnknownColorBytes1[6];
+
+			uint4 WhateverCounter1;
+
 	};
 
 }

@@ -78,8 +78,12 @@ void FileViewerForm::UpdateLayout() {
 				ui.listWidget->addItem("Vector " + QString::number(i) + ".z: " + QString::number(model->Vectors[i].z));
 			}
 
+			std::stringstream ss;
+			ss << std::hex << model->MaybeScriptEntry;
+
 			ui.listWidget->addItem("Geometry file " + QString::number(model->GeometryEntry.second));
 			ui.listWidget->addItem("Texture file " + QString::number(model->TextureEntry.second));
+			ui.listWidget->addItem("Maybe script id: " + QString(ss.str().c_str()));
 		}
 		else if (entry.type == popbin::EntryType::TEXTURE) {
 			auto model = (popbin::TextureModel*)entry.model;

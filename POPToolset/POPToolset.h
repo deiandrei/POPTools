@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/qfiledialog.h>
+#include <qsortfilterproxymodel.h>
 #include "ui_POPToolset.h"
 
 #include <fstream>
@@ -22,6 +23,7 @@ class POPToolset : public QMainWindow {
 
 	private:
 		Ui::POPToolsetClass ui;
+		QSortFilterProxyModel* mSortModel;
 
 		std::string mCurrentFile;
 
